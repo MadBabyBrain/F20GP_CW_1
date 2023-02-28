@@ -17,20 +17,21 @@ public class EnemyManager : MonoBehaviour
             Vector3 pos = Vector3.zero;
 
             foreach (Transform c2 in c) {
-                pos += c2.position;
+                // pos += c2.position;
+                c2.gameObject.SetActive(Mathf.Abs(Vector3.Distance(this.target.transform.position, c2.position)) < 40f);
             }
 
             // pos /= c.childCount;
 
-            Vector3 oldpos = c.position;
+            // Vector3 oldpos = c.position;
 
-            c.position = (c.childCount == 0) ? Vector3.zero : pos /= c.childCount;
+            // c.position = (c.childCount == 0) ? Vector3.zero : pos /= c.childCount;
 
-            c.gameObject.SetActive(Mathf.Abs(Vector3.Distance(this.target.transform.position, c.position)) < 40f);
+            // c.gameObject.SetActive(Mathf.Abs(Vector3.Distance(this.target.transform.position, c.position)) < 40f);
             
-            foreach (Transform c2 in c) {
-                c2.position -= c.position - oldpos;
-            }
+            // foreach (Transform c2 in c) {
+            //     c2.position -= c.position - oldpos;
+            // }
 
             // foreach (Transform c2 in c.transform) {
             //     bool e = (Mathf.Abs(Vector3.Distance(this.target.transform.position, c2.position)) < 40f);

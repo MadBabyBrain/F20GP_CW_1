@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33908165129101500}
   - component: {fileID: 23592748687021426}
   - component: {fileID: 95500461802887890}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: CardboardBox4
   m_TagString: Untagged
   m_Icon: {fileID: 0}

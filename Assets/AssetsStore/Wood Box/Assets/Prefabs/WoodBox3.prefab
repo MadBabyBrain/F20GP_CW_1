@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 23966243795122768}
   - component: {fileID: 795833099931362179}
   - component: {fileID: 8233819649138525200}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: WoodBox3
   m_TagString: Ground
   m_Icon: {fileID: 0}

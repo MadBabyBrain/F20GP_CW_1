@@ -7,40 +7,48 @@ public class Finder : MonoBehaviour
 {
     public GameObject target;
     public Vector3 tPos;
-    // public Animator anim;
-    // public Animation idle, walk, shoot;
     public Animation anim;
     public Bullet bullet;
     public int health = 0;
     public float followDistance = 0f;
     public NavMeshAgent agent;
-    // public NavMeshObstacle obstacle;
     public Rigidbody rb;
-    // Start is called before the first frame update
+
+    public LayerMask EnemyMask;
+
+    public Vector3 destination;
+
+
+    [Range(0, 360)]
+    public int points = 0;
+    [Range(0, 360)]
+    public float viewingAngle = 90;
+    public float viewRange = 10f;
+    public Vector3 currentlyFacing;
+    public List<RaycastHit> hits;
+
+    public bool viewingPlayer;
+
     void Start()
     {
         this.agent = GetComponent<NavMeshAgent>();
-        // this.obstacle = GetComponent<NavMeshObstacle>();
         this.target = GameObject.FindWithTag("Player");
         this.rb = this.GetComponent<Rigidbody>();
+        this.EnemyMask = LayerMask.GetMask("Enemy");
 
-        // this.obstacle.enabled = false;
         tPos = target.transform.position;
         agent.destination = target.transform.position;
 
         this.anim = this.GetComponent<Animation>();
 
-        // this.idle  = this.anim.GetClip("Idle");
-        // this.walk  = this.anim.GetClip("Walking");
-        // this.shoot = this.anim.GetClip("Shooting");
-        
         this.health += 100;
+        this.viewingPlayer = false;
+        this.agent.isStopped = false;
     }
 
     private void Update() {
+
         if (Mathf.Abs(Vector3.Distance(this.tPos, target.GetComponent<Rigidbody>().position)) > 0.1f) {
-            // this.obstacle.enabled = false;
-            // this.agent.enabled = true;
             
             agent.destination = target.transform.position;
         }
@@ -51,43 +59,119 @@ public class Finder : MonoBehaviour
             agent.isStopped = true;
             if (!this.anim.IsPlaying("Idle"))
                 this.anim.Play("Idle");
-            // this.agent.enabled = false;
-            // this.obstacle.enabled = true;
-            // return;
         } else {
-            // this.obstacle.enabled = false;
-            // this.agent.enabled = true;
-
-            agent.destination = target.transform.position;
+            // agent.destination = target.transform.position;
             agent.isStopped = false;
 
-            if (agent.velocity.magnitude < 0.1f) {
+            if (!this.anim.IsPlaying("Walking") && !viewingPlayer)
+                this.anim.Play("Walking");
+
+
+            this.destination = CheckInFront();
+
+            if (this.destination == Vector3.zero) {
+                float angle = Random.Range(Mathf.PI / 4, Mathf.PI * 3 / 4);
+
+                this.destination = this.rb.position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+            }
+            
+            Debug.DrawLine(this.rb.position, this.destination, Color.blue);
+            agent.destination = this.destination;
+
+            CheckforPlayer();
+
+            // if (agent.velocity.magnitude < 0.1f) {
                 
+            //     this.rb.transform.rotation = Quaternion.Lerp(this.rb.rotation, Quaternion.LookRotation(this.target.GetComponent<Rigidbody>().transform.position - this.rb.transform.position), 0.7f);
+            //     Vector3 rot = this.rb.transform.rotation.eulerAngles;
+            //     rot.x = 0;
+            //     rot.z = 0;
+            //     this.rb.transform.rotation = Quaternion.Euler(rot);
+            //     RaycastHit hit;
+            //     if (Physics.SphereCast(this.rb.position + Vector3.up, 0.3f, this.rb.rotation * Vector3.forward, out hit, 10f, ~(1 << LayerMask.NameToLayer("Bullet")))) {
+            //         if (hit.transform.CompareTag("Player")) {
+            //             if (!this.anim.IsPlaying("Shooting"))
+            //                 this.anim.Play("Shooting");
+            //         } else {
+            //             if (!this.anim.IsPlaying("Idle"))
+            //                 this.anim.Play("Idle");
+            //         }
+            //     }
+            // } else {
+            //     if (!this.anim.IsPlaying("Walking"))
+            //         this.anim.Play("Walking");
+            // }
+            
+        }
+    }
+
+    public Vector3 CheckInFront() {
+        this.currentlyFacing = this.transform.rotation.eulerAngles;
+        for (int i = 0, i2 = 0; i < (this.points * 2) + 1; i++) {
+
+            float t = Mathf.Pow(-1, i) * (this.viewingAngle / ((this.points * 2) + 1)) * i2 + this.currentlyFacing.y;
+            Vector3 end = new Vector3(Mathf.Sin(Mathf.Deg2Rad * t), 0, Mathf.Cos(Mathf.Deg2Rad * t));
+
+            if (i % 2 == 0) i2++;
+
+            // Debug.DrawLine(this.rb.transform.position + Vector3.up, this.rb.transform.position + Vector3.up + end, Color.green);
+
+            this.hits = new List<RaycastHit>(Physics.RaycastAll(this.transform.position + Vector3.up, end, this.viewRange, this.EnemyMask.value | 1 << LayerMask.NameToLayer("Wall") | 1 << LayerMask.NameToLayer("Cards")));
+
+            Debug.DrawLine(this.rb.position + Vector3.up, this.rb.position + Vector3.up + new Vector3(end.x, 0, end.z), Color.red);
+
+            if (this.hits.Count == 0) return this.rb.position + new Vector3(end.x, 0, end.z);
+        }
+        return Vector3.zero;
+    }
+
+    public void CheckforPlayer() {
+        // for (int i = 0, i2 = 0; i < (this.points * 2) + 1; i++) {
+
+        //     float t = Mathf.Pow(-1, i) * (this.viewingAngle / ((this.points * 2) + 1)) * i2 + this.currentlyFacing.y;
+        for (int i = 0, i2 = 0; i < 36; i++) {
+            float t = Mathf.Pow(-1, i) * (360 / 36) * i2 + this.currentlyFacing.y;
+            Vector3 end = new Vector3(Mathf.Sin(Mathf.Deg2Rad * t), 0, Mathf.Cos(Mathf.Deg2Rad * t));
+
+            if (i % 2 == 0) i2++;
+
+            Debug.DrawLine(this.rb.transform.position + Vector3.up, this.rb.transform.position + Vector3.up + (end * this.viewRange * 3f), Color.green);
+
+            this.hits = new List<RaycastHit>(Physics.RaycastAll(this.transform.position + Vector3.up, end, this.viewRange * 3f, 1 << LayerMask.NameToLayer("Player")));
+
+            if (this.hits.Count > 0) {
+                this.agent.destination = this.rb.position;
                 this.rb.transform.rotation = Quaternion.Lerp(this.rb.rotation, Quaternion.LookRotation(this.target.GetComponent<Rigidbody>().transform.position - this.rb.transform.position), 0.7f);
                 Vector3 rot = this.rb.transform.rotation.eulerAngles;
                 rot.x = 0;
                 rot.z = 0;
                 this.rb.transform.rotation = Quaternion.Euler(rot);
+
                 RaycastHit hit;
-                // if (Physics.Raycast(this.rb.position + Vector3.up, this.rb.transform.rotation * Vector3.forward, out hit, 10f, ~(1 << LayerMask.NameToLayer("Bullet")))) {
-                if (Physics.SphereCast(this.rb.position + Vector3.up, 0.3f, this.rb.rotation * Vector3.forward, out hit, 10f, ~(1 << LayerMask.NameToLayer("Bullet")))) {
-                    Debug.DrawLine(this.rb.position + Vector3.up, hit.point, Color.green);
-                    if (hit.transform.CompareTag("Player")) {
-                        // this.agent.enabled = false;
-                        // this.obstacle.enabled = true;
-                        if (!this.anim.IsPlaying("Shooting"))
-                            this.anim.Play("Shooting");
-                    } else {
-                        if (!this.anim.IsPlaying("Idle"))
-                            this.anim.Play("Idle");
-                    }
+                Physics.Raycast(this.transform.position + Vector3.up, end, out hit, this.viewRange * 3f, ~(1 << LayerMask.NameToLayer("Bullet")));
+
+                if (hit.transform.CompareTag("Player")) {
+                    if (!this.anim.IsPlaying("Shooting"))
+                        this.anim.Play("Shooting");
+                } else {
+                    if (!this.anim.IsPlaying("Idle"))
+                        this.anim.Play("Idle");
                 }
-            } else {
-                if (!this.anim.IsPlaying("Walking"))
-                    this.anim.Play("Walking");
+                this.viewingPlayer = true;
+                return;
+                // RaycastHit hit;
+                // if (Physics.SphereCast(this.rb.position + Vector3.up, 0.3f, this.rb.rotation * Vector3.forward, out hit, 10f, ~(1 << LayerMask.NameToLayer("Bullet")))) {
+                //     if (hit.transform.CompareTag("Player")) {
+                //         if (!this.anim.IsPlaying("Shooting"))
+                //             this.anim.Play("Shooting");
+                //     } else {
+                //         if (!this.anim.IsPlaying("Idle"))
+                //             this.anim.Play("Idle");
+                //     }
+                // }
             }
-            
         }
+        this.viewingPlayer = false;
     }
 
     public float RemainingDistance(Vector3[] points) {

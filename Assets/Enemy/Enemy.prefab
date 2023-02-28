@@ -731,7 +731,7 @@ GameObject:
   - component: {fileID: 1172842563339505428}
   - component: {fileID: 1485456617120101468}
   - component: {fileID: 5601063252190114660}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -784,7 +784,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 4
+  m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -828,6 +828,15 @@ MonoBehaviour:
   followDistance: 20
   agent: {fileID: 0}
   rb: {fileID: 0}
+  EnemyMask:
+    serializedVersion: 2
+    m_Bits: 0
+  destination: {x: 0, y: 0, z: 0}
+  points: 5
+  viewingAngle: 200
+  viewRange: 2
+  currentlyFacing: {x: 0, y: 0, z: 0}
+  viewingPlayer: 0
 --- !u!111 &5601063252190114660
 Animation:
   m_ObjectHideFlags: 0
