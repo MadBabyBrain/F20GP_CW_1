@@ -59,14 +59,12 @@ public class Finder : MonoBehaviour
 
         if (RemainingDistance(agent.path.corners) > followDistance)
         {
-            agent.isStopped = true;
+            agent.destination = this.transform.position;
             if (!this.anim.IsPlaying("Idle"))
                 this.anim.Play("Idle");
         }
         else
         {
-            agent.isStopped = false;
-
             if (!this.anim.IsPlaying("Walking") && !viewingPlayer)
                 this.anim.Play("Walking");
 

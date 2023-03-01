@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
 
     private RaycastHit hit;
 
-    public LayerMask wallMask, bulletMask, cardMask;
+    public LayerMask wallMask, bulletMask, cardMask, enemyMask;
 
     void Start()
     {
@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
         this.wallMask = LayerMask.GetMask("Wall");
         this.bulletMask = LayerMask.GetMask("Bullet");
         this.cardMask = LayerMask.GetMask("Cards");
+        this.enemyMask = LayerMask.GetMask("Enemy");
 
         // get rigidbody
         this.rb = this.GetComponent<Rigidbody>();
@@ -153,14 +154,14 @@ public class PlayerMovement : MonoBehaviour
 
         RaycastHit h;
 
-        if (Physics.Raycast(this.rb.position + Vector3.up, new Vector3(move.x, 0f, 0f), out h, Mathf.Abs(move.x) * 8f, ~this.cardMask.value))
+        if (Physics.Raycast(this.rb.position + Vector3.up, new Vector3(move.x, 0f, 0f), out h, Mathf.Abs(move.x) * 8f, ~(this.cardMask.value | this.enemyMask.value)))
         {
             if (Vector3.Magnitude(h.point - (this.rb.position + Vector3.up)) < 0.5f)
             {
                 move.x = 0f;
             }
         }
-        if (Physics.Raycast(this.rb.position + Vector3.up, new Vector3(0f, 0f, move.z), out h, Mathf.Abs(move.z) * 8f, ~this.cardMask.value))
+        if (Physics.Raycast(this.rb.position + Vector3.up, new Vector3(0f, 0f, move.z), out h, Mathf.Abs(move.z) * 8f, ~(this.cardMask.value | this.enemyMask.value)))
         {
             if (Vector3.Magnitude(h.point - (this.rb.position + Vector3.up)) < 0.5f)
             {
