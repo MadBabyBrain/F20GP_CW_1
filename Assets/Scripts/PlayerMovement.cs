@@ -9,9 +9,9 @@ public class PlayerMovement : MonoBehaviour
     public GameObject cam;
     public Bullet bullet;
 
-    public float walkSpeed = 4f, speed, currentTime, g1ReloadTime = 0.1f, g2ReloadTime = 5f, g1CurrReloadTime, g2CurrReloadTime;
-    public int damage = 10, health, maxAmmo, currAmmo;
-    public bool reloading, shooting, blasting, showingEnemy;
+    public float walkSpeed = 4f, speed = 0f, currentTime = 0f, g1ReloadTime = 0.1f, g2ReloadTime = 5f, g1CurrReloadTime = 0f, g2CurrReloadTime = 0f;
+    public int damage = 10, health = 0, maxAmmo = 0, currAmmo = 0;
+    public bool reloading = false, shooting = false, blasting = false, showingEnemy = false;
 
     public Vector3 rotation = Vector3.zero, movement = Vector3.zero, offset = Vector3.zero;
     public Rigidbody rb;
@@ -36,10 +36,15 @@ public class PlayerMovement : MonoBehaviour
         this.rotation = this.transform.rotation.eulerAngles;
 
         // 
+        this.damage = 10;
         this.health = 100;
         this.maxAmmo = 10;
         this.currAmmo = this.maxAmmo;
+        this.walkSpeed = 4f;
+        this.speed = 0f;
         this.currentTime = 0f;
+        this.g1ReloadTime = 0.1f;
+        this.g2ReloadTime = 5f;
         this.g1CurrReloadTime = this.g1ReloadTime;
         this.g2CurrReloadTime = this.g2ReloadTime;
 

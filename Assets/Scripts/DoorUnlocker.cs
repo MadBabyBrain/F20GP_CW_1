@@ -6,7 +6,8 @@ public class DoorUnlocker : MonoBehaviour
 {
     void Update()
     {
-        if (this.transform.parent.GetChild(1).childCount == 0) {
+        if (this.transform.parent.GetChild(1).childCount == 0)
+        {
             this.gameObject.SetActive(false);
         }
     }
